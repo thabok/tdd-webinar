@@ -6,9 +6,10 @@ on:
   push:
 
 permissions:
-  contents: write
   actions: read
+  contents: write
   checks: write
+  pull-requests: write
 
 env:
   EP_RELEASE: 24.3p0
@@ -69,10 +70,9 @@ jobs:
     - name: Add test report link to PR
       if: always() && github.event_name == 'pull_request'
       run: |
-        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-        REPO_NAME=$(jq --raw-output .repository.name "$GITHUB_EVENT_PATH")
-        REPORT_URL="https://thabok.github.io/${REPO_NAME}/report.html"
-        curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        REPORT_URL="https://thabok.github.io/${{ github.event.repository.name }}/report.html"
+        API_URL="https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments"
+        curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
           -X POST \
-          -d "{\"body\": \"Test report: [View Report](${REPORT_URL})\"}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+          -d "{\"body\": \"Test report: [View Report](${REPORT_URL})\"}" ${API_URL}
