@@ -65,6 +65,9 @@ jobs:
         path: reports/test_results.xml
         reporter: jest-junit
         only-summary: 'false'
+
+    # ensures that the previous step publishes test results, even if it fails    
+    - run: echo 1337
         
     - name: Add test report link to PR
       if: always() && github.event_name == 'pull_request'
@@ -75,4 +78,4 @@ jobs:
         curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -X POST \
           -d "{\"body\": \"Test report: [View Report](${REPORT_URL})\"}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+            "https://api.github.com/repos/${{ github.repository_owner }}/${{ github.repository }}/issues/${PR_NUMBER}/comments"
