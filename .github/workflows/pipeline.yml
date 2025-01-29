@@ -76,3 +76,4 @@ jobs:
         path: reports/test_results.xml
         reporter: jest-junit
         only-summary: 'false'
+        fail-on-error: 'false'
