@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from btc_embedded import EPRestApi, get_merged_config, util
+from btc_embedded import EPRestApi, util
 
 # expect epp file matching the mdl/slx file name the 'model' directory
 work_dir = os.path.abspath('test')
@@ -9,7 +9,7 @@ epp_file = os.path.join(work_dir, 'seat_heating_control_converted.epp')
 project_name = os.path.basename(epp_file)[:-7]
 
 # BTC EmbeddedPlatform API object
-ep = EPRestApi(config=get_merged_config())
+ep = EPRestApi()
 
 # Load a BTC EmbeddedPlatform profile (*.epp) and update it
 ep.get(f'profiles/{epp_file}', message="Loading profile")

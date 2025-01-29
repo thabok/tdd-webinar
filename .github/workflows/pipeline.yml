@@ -10,6 +10,10 @@ permissions:
   actions: read
   checks: write
 
+env:
+  EP_RELEASE: 25.1p0
+  MATLAB_RELEASE: R2023b
+
 jobs:
   btc-tests:
     name: Test execution
@@ -24,22 +28,51 @@ jobs:
     - name: Checkout files
       uses: actions/checkout@v4
 
-    - name: Run tests
-      shell: powershell
+    - name: Build docker image
       run: |
-        python test/run_tests.py
+        echo "$ML_LIC_CONTENT" > "${GITHUB_WORKSPACE}/matlab.lic"
+        echo "$BTC_LIC_CONTENT" > "${GITHUB_WORKSPACE}/btc.lic"
+        if [[ "$(docker images -q ep-ml:${EP_RELEASE}_${MATLAB_RELEASE} 2> /dev/null)" == "" ]]; then
+          docker build -t ep-ml:${EP_RELEASE}_${MATLAB_RELEASE} \
+            --build-arg EP_RELEASE=${EP_RELEASE} \
+            --build-arg MATLAB_RELEASE=${MATLAB_RELEASE} \
+            .
+        fi
+
+      env:
+        ML_LIC_CONTENT: ${{ secrets.ML_LICENSE }}
+        BTC_LIC_CONTENT: ${{ secrets.BTC_LICENSE }}
+
+    - name: Run tests (docker/linux)
+      run: |
+        docker run --rm --mac-address 02:42:ac:11:13:37 \
+          --volume "${{github.workspace}}:/workdir" \
+          --workdir "/workdir" \
+          ep-ml:${EP_RELEASE}_${MATLAB_RELEASE} \
+          python3 test/run_tests.py
 
     - name: Publish test results to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: reports
-            
+    
+    - name: Add test report link to PR
+      if: github.event_name == 'pull_request'
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        REPO_NAME=$(jq --raw-output .repository.name "$GITHUB_EVENT_PATH")
+        REPORT_URL="https://thabok.github.io/${REPO_NAME}/report.html"
+        curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -X POST \
+          -d "{\"body\": \"Test report: [View Report](${REPORT_URL})\"}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+
     - name: Publish results
       uses: dorny/test-reporter@v1
       if: success() || failure()
       with:
         name: Test results
-        path: test_results.xml
+        path: reports/test_results.xml
         reporter: jest-junit
         only-summary: 'false'
