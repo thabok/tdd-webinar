@@ -11,8 +11,8 @@ permissions:
   checks: write
 
 env:
-  EP_RELEASE: 25.1p0
-  MATLAB_RELEASE: R2023b
+  EP_RELEASE: 24.3p0
+  MATLAB_RELEASE: R2024b
 
 jobs:
   btc-tests:
