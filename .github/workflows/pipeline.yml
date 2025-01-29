@@ -75,7 +75,7 @@ jobs:
       if: always() && github.event_name == 'pull_request'
       run: |
         REPORT_URL="https://thabok.github.io/${{ github.repository }}/report.html"
-        API_URL="https://api.github.com/repos/${{ github.repository_owner }}/${{ github.repository }}/issues/${{ github.event.number }}/comments"
+        API_URL="https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments"
         curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
           -X POST \
