@@ -28,9 +28,11 @@ jobs:
         }}
 
     steps:
+    # (1) --- Checkout files ---
     - name: Checkout files
       uses: actions/checkout@v4
 
+    # (2) --- Build docker image ---
     - name: Build docker image
       run: |
         echo "$ML_LIC_CONTENT" > "${GITHUB_WORKSPACE}/matlab.lic"
@@ -41,11 +43,11 @@ jobs:
             --build-arg MATLAB_RELEASE=${MATLAB_RELEASE} \
             .
         fi
-
       env:
         ML_LIC_CONTENT: ${{ secrets.ML_LICENSE }}
         BTC_LIC_CONTENT: ${{ secrets.BTC_LICENSE }}
 
+    # (3) --- Run BTC tests (MIL + SIL) ---
     - name: Run tests (docker/linux)
       run: |
         docker run --rm --mac-address 02:42:ac:11:13:37 \
@@ -54,12 +56,14 @@ jobs:
           ep-ml:${EP_RELEASE}_${MATLAB_RELEASE} \
           python3 test/run_tests.py
 
+    # (4) --- Publish test report ---
     - name: Publish test results to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: reports
     
+    # (5) --- Publish test results ---
     - name: Publish results
       uses: dorny/test-reporter@v1
       if: success() || failure()
@@ -69,6 +73,7 @@ jobs:
         reporter: jest-junit
         only-summary: 'false'
         
+    # (6) --- Add test report link to PR ---
     - name: Add test report link to PR
       if: always() && github.event_name == 'pull_request'
       run: |
