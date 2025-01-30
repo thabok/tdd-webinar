@@ -4,7 +4,7 @@ This is the example repo for Test-driven Development webinar (January 2025) incl
 ## Current Status
 ![CI](https://github.com/thabok/tdd-webinar/actions/workflows/pipeline.yml/badge.svg)
 
-Detailed report: https://thabok.github.io/tdd-webinar/report.html
+[BTC Test Report](https://thabok.github.io/tdd-webinar/report.html)
 
 ## Model files
 The model directory contains all files relevant to the Simulink model:
@@ -20,7 +20,7 @@ The test folder contains the test projects (interactive MIL project for develope
 
 
 ## Automated Tests 
-The GitHub Actions [pipeline](../.github/workflows/pipeline.yml) is triggered on pull requests and pushes. It performs the following steps:
+The GitHub Actions [pipeline](.github/workflows/pipeline.yml) is triggered on pull requests and pushes. It performs the following steps:
 - Checkout files: Uses the actions/checkout@v4 action to check out the repository files.
 - Build docker image: Builds a Docker image named ep-ml with specific environment variables if the image does not already exist.
 - Run tests (docker/linux): Runs tests inside the Docker container using a specified Python script.
