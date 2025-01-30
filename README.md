@@ -1,6 +1,11 @@
 # Example Repo: Test-driven Development Webinar 
 This is the example repo for Test-driven Development webinar (January 2025) including automated tests.
 
+## Current Status
+![CI](https://github.com/thabok/tdd-webinar/actions/workflows/pipeline.yml/badge.svg)
+
+Detailed report: https://thabok.github.io/tdd-webinar/report.html
+
 ## Model files
 The model directory contains all files relevant to the Simulink model:
 - **seat_heating_controller.slx** (main model)
